@@ -1,31 +1,23 @@
 {% extends "base.html" %}
 
-{% block title %}
-    {% if is_register %}Register{% else %}Login{% endif %}
-{% endblock %}
+{% block title %}Register - SecureCrypt{% endblock %}
 
 {% block content %}
-<div class="login-wrapper d-flex justify-content-center align-items-center flex-grow-1"> {# Removed min-vh-100, added flex-grow-1 #}
+<div class="login-wrapper d-flex justify-content-center align-items-center flex-grow-1">
     <div class="col-md-5 col-lg-4">
-        <div class="auth-card"> {# Replaced original card classes #}
+        <div class="auth-card">
             <div class="card-body">
-                <div class="auth-header"> {# New auth-header structure #}
+                <div class="auth-header">
                     <div class="auth-icon">
                         <i class="bi bi-lock-fill"></i>
                     </div>
                     <h3>
-                        {% if is_register %}
-                            Create an Account
-                        {% else %}
-                            Welcome Back
-                        {% endif %}
+                        Create an Account
                     </h3>
                     <p>Enter your credentials to continue.</p>
                 </div>
-
-                {# Flash messages are now handled in base.html #}
-
-                <form method="post" action="{{ url_for('register') if is_register else url_for('login') }}" novalidate>
+                
+                <form method="post" action="{{ url_for('register') }}" novalidate>
                     <div class="form-floating mb-3">
                         <input
                             type="text"
@@ -47,7 +39,7 @@
                             id="password"
                             name="password"
                             placeholder="Password"
-                            autocomplete="{{ 'new-password' if is_register else 'current-password' }}"
+                            autocomplete="new-password"
                             required
                             minlength="6"
                         >
@@ -60,28 +52,37 @@
                         </button>
                     </div>
 
-                    {% if is_register %}
+                    <div class="form-floating mb-3">
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="confirm_password"
+                            name="confirm_password"
+                            placeholder="Confirm Password"
+                            autocomplete="new-password"
+                            required
+                            minlength="6"
+                        >
+                        <label for="confirm_password"><i class="bi bi-check-circle"></i> Confirm Password</label>
+                        <button type="button"
+                                class="btn btn-sm btn-link position-absolute end-0 top-50 translate-middle-y me-2 text-decoration-none toggle-password-confirm"
+                                aria-label="Tampilkan/sembunyikan konfirmasi password"
+                                tabindex="-1">
+                            <i class="bi bi-eye-slash" id="toggleConfirmPasswordIcon"></i>
+                        </button>
+                    </div>
                     <div class="form-text mb-3">Minimal 6 karakter.</div>
-                    {% endif %}
 
                     <div class="d-grid mt-4">
                         <button type="submit" class="btn btn-primary btn-lg">
-                            {% if is_register %}
-                                <i class="bi bi-person-plus me-1"></i> Register
-                            {% else %}
-                                <i class="bi bi-box-arrow-in-right me-1"></i> Login
-                            {% endif %}
+                            <i class="bi bi-person-plus me-1"></i> Register
                         </button>
                     </div>
                 </form>
 
                 <div class="auth-footer">
                     <p>
-                    {% if is_register %}
                         Already have an account? <a href="{{ url_for('login') }}">Login here</a>
-                    {% else %}
-                        Don't have an account? <a href="{{ url_for('register') }}">Register here</a>
-                    {% endif %}
                     </p>
                 </div>
             </div>
@@ -91,16 +92,29 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const toggleBtn = document.querySelector('.toggle-password');
+    const togglePasswordBtn = document.querySelector('.toggle-password');
     const passwordInput = document.getElementById('password');
-    const toggleIcon = document.getElementById('togglePasswordIcon');
+    const togglePasswordIcon = document.getElementById('togglePasswordIcon');
 
-    if (toggleBtn && passwordInput && toggleIcon) {
-        toggleBtn.addEventListener('click', function () {
+    if (togglePasswordBtn && passwordInput && togglePasswordIcon) {
+        togglePasswordBtn.addEventListener('click', function () {
             const isPassword = passwordInput.type === 'password';
             passwordInput.type = isPassword ? 'text' : 'password';
-            toggleIcon.classList.toggle('bi-eye');
-            toggleIcon.classList.toggle('bi-eye-slash');
+            togglePasswordIcon.classList.toggle('bi-eye');
+            togglePasswordIcon.classList.toggle('bi-eye-slash');
+        });
+    }
+
+    const toggleConfirmPasswordBtn = document.querySelector('.toggle-password-confirm');
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    const toggleConfirmPasswordIcon = document.getElementById('toggleConfirmPasswordIcon');
+
+    if (toggleConfirmPasswordBtn && confirmPasswordInput && toggleConfirmPasswordIcon) {
+        toggleConfirmPasswordBtn.addEventListener('click', function () {
+            const isPassword = confirmPasswordInput.type === 'password';
+            confirmPasswordInput.type = isPassword ? 'text' : 'password';
+            toggleConfirmPasswordIcon.classList.toggle('bi-eye');
+            toggleConfirmPasswordIcon.classList.toggle('bi-eye-slash');
         });
     }
 });

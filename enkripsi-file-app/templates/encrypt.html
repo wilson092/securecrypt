@@ -1,70 +1,288 @@
 {% extends "base.html" %}
 
-{% block title %}Encrypt File{% endblock %}
+{% block title %}Enkripsi File - SecureCrypt{% endblock %}
 
 {% block content %}
+<div class="page-header text-center mb-4">
+    <h2><i class="bi bi-lock"></i> Enkripsi File</h2>
+    <p class="text-muted">Pilih file, pilih metode, dan lindungi dengan password</p>
+</div>
+
 <div class="row justify-content-center">
-    <div class="col-md-10 col-lg-8">
-        <div class="card p-lg-4">
-            <div class="card-body">
-                <div class="text-center mb-4">
-                    <h2 class="fw-bold">Encrypt a File</h2>
-                    <p class="text-muted-custom">Secure your data by encrypting it with a password.</p>
-                </div>
-                
-                <form method="post" enctype="multipart/form-data">
-                    <!-- Step 1: File Upload -->
-                    <div class="mb-4">
-                        <label class="form-label">1. Upload Your File</label>
-                        <input class="d-none" type="file" id="file" name="file" required>
-                        <div id="drop-zone" class="drop-zone">
-                            <div id="file-info">
-                                <i class="bi bi-cloud-arrow-up"></i>
-                                <div>Drag & drop your file here, or click to select</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 2: Password -->
-                    <div class="mb-4">
-                        <label for="password" class="form-label">2. Set Encryption Password</label>
-                        <div class="position-relative">
-                           <i class="bi bi-lock input-group-icon"></i>
-                           <input type="password" class="form-control form-control-icon" id="password" name="password" required placeholder="Enter a strong password">
-                        </div>
-                        <div class="form-text">This password will be required for decryption. Keep it safe.</div>
-                    </div>
-
-                    <!-- Step 3: Method Selection -->
-                    <div class="mb-4">
-                        <label class="form-label">3. Choose Encryption Method</label>
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <input class="form-check-input d-none" type="radio" name="method" id="method_aes" value="aes" checked>
-                                <label class="method-select-label text-center h-100" for="method_aes">
-                                    <strong class="d-block">AES</strong>
-                                    <small class="text-muted-custom">Recommended</small>
-                                </label>
-                            </div>
-                            <div class="col-6">
-                                <input class="form-check-input d-none" type="radio" name="method" id="method_fernet" value="fernet">
-                                <label class="method-select-label text-center h-100" for="method_fernet">
-                                    <strong class="d-block">Fernet</strong>
-                                    <small class="text-muted-custom">High-level</small>
-                                </label>
-                            </div>
-                        </div>
+    <div class="col-lg-8"> {# This column will help constrain the width for large screens #}
+        <div class="securecrypt-card large-card"> {# Applied large-card to match max-width: 800px #}
+            <form method="post" enctype="multipart/form-data" id="encryptForm">
+                <!-- Step 1: File Upload -->
+                <div class="form-step">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <h5>Upload File</h5>
                     </div>
                     
-                    <!-- Submit Button -->
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="bi bi-shield-lock-fill me-2"></i> Encrypt and Download
+                    <input type="file" class="d-none" id="fileInput" name="file" required>
+                    <div class="drop-zone" id="dropZone">
+                        <div class="drop-zone-content" id="dropContent">
+                            <i class="bi bi-cloud-arrow-up upload-icon"></i>
+                            <p class="upload-text">Seret & lepas file di sini</p>
+                            <p class="upload-hint">atau <span class="browse-link">jelajahi file</span></p>
+                            <small class="text-muted">Maksimal 100MB</small>
+                        </div>
+                        <div class="file-preview" id="filePreview" style="display: none;">
+                            <div class="file-info">
+                                <i class="bi bi-file-earmark"></i>
+                                <div class="file-details">
+                                    <span class="file-name" id="fileName">file.pdf</span>
+                                    <span class="file-size" id="fileSize">2.4 MB</span>
+                                    <span class="file-icon bi bi-file-earmark"></span>
+                                </div>
+                                <button type="button" class="remove-file" id="removeFile">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            <div class="upload-progress">
+                                <div class="progress-bar" id="uploadProgress" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Password -->
+                <div class="form-step">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <h5>Set Password</h5>
+                    </div>
+                    
+                    <div class="password-input-group"> {# Custom wrapper for password input and toggle #}
+                        <input type="password" class="form-control form-control-lg" 
+                               id="password" name="password" 
+                               placeholder="Masukkan password kuat" required>
+                        <button type="button" class="password-toggle-btn" id="togglePassword">
+                            <i class="bi bi-eye"></i>
                         </button>
                     </div>
-                </form>
+                    <div class="password-strength" id="passwordStrength">
+                        <div class="strength-bar"></div>
+                        <span class="strength-text">Kekuatan password</span>
+                    </div>
+                    <small class="text-muted">Password ini akan digunakan untuk dekripsi. Simpan dengan aman.</small>
+                </div>
+
+                <!-- Step 3: Method -->
+                <div class="form-step">
+                    <div class="step-header">
+                        <span class="step-number">3</span>
+                        <h5>Pilih Metode</h5>
+                    </div>
+                    
+                    <div class="method-grid">
+                        <label class="method-card active" id="methodAes">
+                            <input type="radio" name="method" value="aes" checked class="d-none">
+                            <div class="method-icon">
+                                <i class="bi bi-microchip"></i>
+                            </div>
+                            <div class="method-info">
+                                <h6>AES-256</h6>
+                                <small>CBC + PBKDF2</small>
+                                <span class="method-badge">Recommended</span>
+                            </div>
+                        </label>
+                        
+                        <label class="method-card" id="methodFernet">
+                            <input type="radio" name="method" value="fernet" class="d-none">
+                            <div class="method-icon">
+                                <i class="bi bi-shield"></i>
+                            </div>
+                            <div class="method-info">
+                                <h6>Fernet</h6>
+                                <small>Authenticated</small>
+                                <span class="method-badge">Secure</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Submit -->
+                <button type="submit" class="btn btn-encrypt btn-lg w-100 mt-4" id="encryptBtn">
+                    <i class="bi bi-shield-lock"></i> Enkripsi Sekarang
+                    <span class="btn-loader d-none">
+                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                        Memproses...
+                    </span>
+                </button>
+            </form>
+        </div>
+        
+        <!-- Result -->
+        {% if encrypted_file %}
+        <div class="result-card animate-slide-up">
+            <div class="result-header success">
+                <i class="bi bi-check-circle-fill"></i>
+                <div>
+                    <h5>Enkripsi Berhasil!</h5>
+                    <small>File Anda telah diamankan</small>
+                </div>
+            </div>
+            <div class="result-body">
+                <div class="result-item">
+                    <span class="label">Metode</span>
+                    <span class="value"><span class="badge bg-primary">{{ method }}</span></span>
+                </div>
+                <div class="result-item">
+                    <span class="label">File</span>
+                    <span class="value">{{ encrypted_file }}</span>
+                </div>
+            </div>
+            <div class="result-actions">
+                <a href="{{ url_for('download_file', folder='encrypted', filename=encrypted_file) }}" 
+                   class="btn btn-success">
+                    <i class="bi bi-download"></i> Download
+                </a>
+                <a href="{{ url_for('encrypt') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-repeat"></i> Enkripsi Lagi
+                </a>
             </div>
         </div>
+        {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ===== Drag & Drop =====
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const filePreview = document.getElementById('filePreview');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeFile = document.getElementById('removeFile');
+    const dropContent = document.getElementById('dropContent');
+    
+    // Click to browse
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    // Drag events
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+    
+    dropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            updateFilePreview(e.dataTransfer.files[0]);
+        }
+    });
+    
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            updateFilePreview(this.files[0]);
+        }
+    });
+    
+    function updateFilePreview(file) {
+        fileName.textContent = file.name;
+        const size = (file.size / 1024 / 1024).toFixed(2);
+        fileSize.textContent = size + ' MB';
+        dropContent.style.display = 'none';
+        filePreview.style.display = 'block';
+        
+        // Animate progress (simplified for visual effect)
+        const progress = document.getElementById('uploadProgress');
+        progress.style.width = '0%'; // Reset before animation
+        let width = 0;
+        const interval = setInterval(() => {
+            width += Math.random() * 15; // Simulate progress
+            if (width >= 100) {
+                width = 100;
+                clearInterval(interval);
+            }
+            progress.style.width = width + '%';
+        }, 100); // Faster animation for preview
+    }
+    
+    removeFile.addEventListener('click', function(e) {
+        e.stopPropagation();
+        fileInput.value = '';
+        dropContent.style.display = 'block';
+        filePreview.style.display = 'none';
+        document.getElementById('uploadProgress').style.width = '0%';
+    });
+    
+    // ===== Password Toggle =====
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    
+    if (togglePassword && passwordInput) {
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('bi-eye');
+            this.querySelector('i').classList.toggle('bi-eye-slash');
+        });
+    }
+    
+    // ===== Password Strength =====
+    passwordInput.addEventListener('input', function() {
+        const strength = calculateStrength(this.value);
+        const bar = document.querySelector('.strength-bar');
+        const text = document.querySelector('.strength-text');
+        
+        const levels = ['', 'Lemah', 'Sedang', 'Kuat', 'Sangat Kuat'];
+        const colors = ['', 'var(--danger)', 'var(--warning)', 'var(--success)', 'var(--primary)'];
+        
+        bar.style.width = (strength * 25) + '%';
+        bar.style.backgroundColor = colors[strength];
+        text.textContent = levels[strength] || 'Kekuatan password';
+    });
+    
+    function calculateStrength(password) {
+        let score = 0;
+        if (password.length >= 6) score++;
+        if (password.length >= 10) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/[0-9]/.test(password)) score++;
+        if (/[^A-Za-z0-9]/.test(password)) score++;
+        return Math.min(score, 4);
+    }
+    
+    // ===== Method Selector =====
+    const methodCards = document.querySelectorAll('.method-card');
+    methodCards.forEach(card => {
+        card.addEventListener('click', function() {
+            methodCards.forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            this.querySelector('input[type="radio"]').checked = true;
+        });
+    });
+    
+    // ===== Form Submit Loading =====
+    const form = document.getElementById('encryptForm');
+    const submitBtn = document.getElementById('encryptBtn');
+    
+    form.addEventListener('submit', function(e) {
+        if (!fileInput.files || fileInput.files.length === 0) {
+            e.preventDefault();
+            dropZone.classList.add('error'); // Add error class for visual feedback
+            setTimeout(() => {
+                dropZone.classList.remove('error');
+            }, 2000);
+            return;
+        }
+        
+        submitBtn.disabled = true;
+        submitBtn.querySelector('i').classList.add('d-none');
+        submitBtn.querySelector('.btn-loader').classList.remove('d-none');
+    });
+});
+</script>
 {% endblock %}

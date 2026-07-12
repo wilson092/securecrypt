@@ -1,35 +1,155 @@
 {% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Beranda - SecureCrypt{% endblock %}
 
 {% block content %}
-<div class="text-center mb-5">
-    <h1 class="display-5 fw-bold">File Security, Simplified</h1>
-    <p class="fs-4 text-muted-custom">Choose an action below to secure or access your files.</p>
+<div class="home-hero">
+    <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="bi bi-shield-check"></i>
+                    <span>Keamanan Tingkat Enterprise</span>
+                </div>
+                
+                {% if session['user_id'] %}
+                <h1 class="hero-title">
+                    Welcome Back, <span class="gradient-text">{{ session['username'] }}</span>
+                </h1>
+                <p class="hero-description">
+                    Protect your files using secure encryption technologies. Quick access to your encryption tools.
+                </p>
+                <div class="hero-actions">
+                    <a href="{{ url_for('encrypt') }}" class="btn btn-encrypt btn-lg">
+                        <i class="bi bi-lock"></i> Encrypt Files
+                    </a>
+                    <a href="{{ url_for('decrypt') }}" class="btn btn-decrypt btn-lg">
+                        <i class="bi bi-unlock"></i> Decrypt Files
+                    </a>
+                </div>
+                {% else %}
+                <h1 class="hero-title">
+                    Lindungi File Anda Dengan
+                    <span class="gradient-text">Enkripsi Kelas Dunia</span>
+                </h1>
+                <p class="hero-description">
+                    Enkripsi file dengan <strong>AES-256</strong> dan <strong>Fernet</strong>. 
+                    Lindungi data sensitif Anda dengan password protection yang kuat.
+                    <span class="highlight-text">Aman, Cepat, dan Mudah.</span>
+                </p>
+                <div class="hero-actions">
+                    <a href="{{ url_for('login') }}" class="btn btn-encrypt btn-lg">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </a>
+                    <a href="{{ url_for('register') }}" class="btn btn-decrypt btn-lg">
+                        <i class="bi bi-person-plus"></i> Register
+                    </a>
+                </div>
+                {% endif %}
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number" data-count="256">0</div>
+                        <div class="stat-label">Bit AES</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-count="100">0</div>
+                        <div class="stat-label">MB Maksimal</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-count="99.9">0</div>
+                        <div class="stat-label">% Keamanan</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="hero-visual">
+                <div class="floating-card card-1">
+                    <i class="bi bi-file-earmark-lock"></i>
+                    <span>AES-256</span>
+                </div>
+                <div class="floating-card card-2">
+                    <i class="bi bi-key"></i>
+                    <span>Fernet</span>
+                </div>
+                <div class="floating-card card-3">
+                    <i class="bi bi-person-lock"></i>
+                    <span>Password</span>
+                </div>
+                <div class="hero-orb orb-center"></div>
+                <div class="hero-orb orb-1"></div>
+                <div class="hero-orb orb-2"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="row g-4 justify-content-center">
-    <div class="col-md-5">
-        <a href="{{ url_for('encrypt') }}" class="action-card">
-            <div class="card h-100">
-                <div class="card-body p-5">
-                    <i class="bi bi-file-earmark-lock-fill icon-encrypt"></i>
-                    <h3 class="card-title fw-bold">Encrypt File</h3>
-                    <p class="text-muted-custom text-center">Secure your file with strong encryption.</p>
-                </div>
-            </div>
-        </a>
+<!-- Features Section -->
+<section class="features-section mt-5">
+    <div class="section-header text-center mb-5">
+        <h2>Fitur <span class="gradient-text">Unggulan</span></h2>
+        <p class="text-muted">Teknologi enkripsi terkini untuk keamanan data Anda</p>
     </div>
-    <div class="col-md-5">
-        <a href="{{ url_for('decrypt') }}" class="action-card">
-            <div class="card h-100">
-                <div class="card-body p-5">
-                    <i class="bi bi-file-earmark-check-fill icon-decrypt"></i>
-                    <h3 class="card-title fw-bold">Decrypt File</h3>
-                    <p class="text-muted-custom text-center">Access your encrypted file securely.</p>
+    
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature-card">
+                <div class="feature-icon icon-aes">
+                    <i class="bi bi-microchip"></i>
                 </div>
+                <h4>AES-256 CBC</h4>
+                <p>Standar enkripsi global dengan key derivation PBKDF2 untuk keamanan maksimal</p>
+                <span class="feature-tag">Enterprise Grade</span>
             </div>
-        </a>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="feature-card">
+                <div class="feature-icon icon-fernet">
+                    <i class="bi bi-shield"></i>
+                </div>
+                <h4>Fernet</h4>
+                <p>Enkripsi authenticated dari library cryptography dengan integritas data</p>
+                <span class="feature-tag">Authenticated</span>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="feature-card">
+                <div class="feature-icon icon-password">
+                    <i class="bi bi-lock"></i>
+                </div>
+                <h4>Password Protection</h4>
+                <p>Proteksi dengan bcrypt hashing dan validasi kekuatan password</p>
+                <span class="feature-tag">Secure Hash</span>
+            </div>
+        </div>
     </div>
-</div>
+</section>
+
+<!-- Trust Badges -->
+<section class="trust-section mt-5">
+    <div class="trust-content">
+        <div class="trust-item">
+            <i class="bi bi-code-square"></i>
+            <span>Open Source</span>
+        </div>
+        <div class="trust-item">
+            <i class="bi bi-database"></i>
+            <span>No Cloud Storage</span>
+        </div>
+        <div class="trust-item">
+            <i class="bi bi-incognito"></i>
+            <span>Privacy First</span>
+        </div>
+        <div class="trust-item">
+            <i class="bi bi-lightning"></i>
+            <span>Fast Processing</span>
+        </div>
+    </div>
+</section>
 {% endblock %}

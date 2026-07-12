@@ -1,70 +1,288 @@
 {% extends "base.html" %}
 
-{% block title %}Decrypt File{% endblock %}
+{% block title %}Dekripsi File - SecureCrypt{% endblock %}
 
 {% block content %}
+<div class="page-header text-center mb-4">
+    <h2><i class="bi bi-unlock"></i> Dekripsi File</h2>
+    <p class="text-muted">Pulihkan data asli dari file terenkripsi</p>
+</div>
+
 <div class="row justify-content-center">
-    <div class="col-md-10 col-lg-8">
-        <div class="card p-lg-4">
-            <div class="card-body">
-                <div class="text-center mb-4">
-                    <h2 class="fw-bold">Decrypt a File</h2>
-                    <p class="text-muted-custom">Restore your original data by decrypting a file.</p>
-                </div>
-                
-                <form method="post" enctype="multipart/form-data">
-                    <!-- Step 1: File Upload -->
-                    <div class="mb-4">
-                        <label class="form-label">1. Upload Your Encrypted File</label>
-                        <input class="d-none" type="file" id="file" name="file" required>
-                        <div id="drop-zone" class="drop-zone">
-                            <div id="file-info">
-                                <i class="bi bi-cloud-arrow-up"></i>
-                                <div>Drag & drop your file here, or click to select</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 2: Password -->
-                    <div class="mb-4">
-                        <label for="password" class="form-label">2. Enter Decryption Password</label>
-                        <div class="position-relative">
-                           <i class="bi bi-key input-group-icon"></i>
-                           <input type="password" class="form-control form-control-icon" id="password" name="password" required placeholder="Enter the decryption password">
-                        </div>
-                        <div class="form-text">You must use the same password and method used for encryption.</div>
-                    </div>
-
-                    <!-- Step 3: Method Selection -->
-                    <div class="mb-4">
-                        <label class="form-label">3. Select Original Encryption Method</label>
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <input class="form-check-input d-none" type="radio" name="method" id="method_aes" value="aes" checked>
-                                <label class="method-select-label text-center h-100" for="method_aes">
-                                    <strong class="d-block">AES</strong>
-                                    <small class="text-muted-custom">Standard</small>
-                                </label>
-                            </div>
-                            <div class="col-6">
-                                <input class="form-check-input d-none" type="radio" name="method" id="method_fernet" value="fernet">
-                                <label class="method-select-label text-center h-100" for="method_fernet">
-                                    <strong class="d-block">Fernet</strong>
-                                    <small class="text-muted-custom">High-level</small>
-                                </label>
-                            </div>
-                        </div>
+    <div class="col-lg-8"> {# This column will help constrain the width for large screens #}
+        <div class="securecrypt-card large-card"> {# Applied large-card to match max-width: 800px #}
+            <form method="post" enctype="multipart/form-data" id="decryptForm">
+                <!-- Step 1: File Upload -->
+                <div class="form-step">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <h5>Upload File Terenkripsi</h5>
                     </div>
                     
-                    <!-- Submit Button -->
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-secondary btn-lg">
-                            <i class="bi bi-file-earmark-check-fill me-2"></i> Decrypt and Download
+                    <input type="file" class="d-none" id="fileInput" name="file" required>
+                    <div class="drop-zone" id="dropZone">
+                        <div class="drop-zone-content" id="dropContent">
+                            <i class="bi bi-cloud-arrow-up upload-icon"></i>
+                            <p class="upload-text">Seret & lepas file di sini</p>
+                            <p class="upload-hint">atau <span class="browse-link">jelajahi file</span></p>
+                            <small class="text-muted">Format: .aes (AES) atau .fernet (Fernet)</small>
+                        </div>
+                        <div class="file-preview" id="filePreview" style="display: none;">
+                            <div class="file-info">
+                                <i class="bi bi-file-earmark-lock file-icon"></i> {# Added file-icon class here #}
+                                <div class="file-details">
+                                    <span class="file-name" id="fileName">file.aes</span>
+                                    <span class="file-size" id="fileSize">2.4 MB</span>
+                                </div>
+                                <button type="button" class="remove-file" id="removeFile">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Password -->
+                <div class="form-step">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <h5>Masukkan Password</h5>
+                    </div>
+                    
+                    <div class="password-input-group"> {# Custom wrapper for password input and toggle #}
+                        <input type="password" class="form-control form-control-lg" 
+                               id="password" name="password" 
+                               placeholder="Password enkripsi" required>
+                        <button type="button" class="password-toggle-btn" id="togglePassword">
+                            <i class="bi bi-eye"></i>
                         </button>
                     </div>
-                </form>
+                    <small class="text-muted">Gunakan password yang sama saat enkripsi</small>
+                </div>
+
+                <!-- Step 3: Method -->
+                <div class="form-step">
+                    <div class="step-header">
+                        <span class="step-number">3</span>
+                        <h5>Pilih Metode</h5>
+                    </div>
+                    
+                    <div class="method-grid">
+                        <label class="method-card active" id="methodAes">
+                            <input type="radio" name="method" value="aes" checked class="d-none">
+                            <div class="method-icon">
+                                <i class="bi bi-microchip"></i>
+                            </div>
+                            <div class="method-info">
+                                <h6>AES-256</h6>
+                                <small>Standard</small>
+                                <span class="method-badge">Versatile</span> {# Added badge #}
+                            </div>
+                        </label>
+                        
+                        <label class="method-card" id="methodFernet">
+                            <input type="radio" name="method" value="fernet" class="d-none">
+                            <div class="method-icon">
+                                <i class="bi bi-shield"></i>
+                            </div>
+                            <div class="method-info">
+                                <h6>Fernet</h6>
+                                <small>High-level</small>
+                                <span class="method-badge">Authenticated</span> {# Added badge #}
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Submit -->
+                <button type="submit" class="btn btn-decrypt btn-lg w-100 mt-4" id="decryptBtn">
+                    <i class="bi bi-file-earmark-check"></i> Dekripsi Sekarang
+                    <span class="btn-loader d-none">
+                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                        Memproses...
+                    </span>
+                </button>
+            </form>
+        </div>
+        
+        <!-- Result -->
+        {% if decrypted_file %}
+        <div class="result-card animate-slide-up">
+            <div class="result-header success">
+                <i class="bi bi-check-circle-fill"></i>
+                <div>
+                    <h5>Dekripsi Berhasil!</h5>
+                    <small>File asli telah dipulihkan</small>
+                </div>
+            </div>
+            <div class="result-body">
+                <div class="result-item">
+                    <span class="label">Metode</span>
+                    <span class="value"><span class="badge bg-success">{{ method }}</span></span>
+                </div>
+                <div class="result-item">
+                    <span class="label">File</span>
+                    <span class="value">{{ decrypted_file }}</span>
+                </div>
+            </div>
+            <div class="result-actions">
+                <a href="{{ url_for('download_file', folder='decrypted', filename=decrypted_file) }}" 
+                   class="btn btn-success">
+                    <i class="bi bi-download"></i> Download
+                </a>
+                <a href="{{ url_for('decrypt') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-repeat"></i> Dekripsi Lagi
+                </a>
             </div>
         </div>
+        {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ===== Drag & Drop =====
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const filePreview = document.getElementById('filePreview');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeFile = document.getElementById('removeFile');
+    const dropContent = document.getElementById('dropContent');
+    
+    // Click to browse
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    // Drag events
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+    
+    dropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            updateFilePreview(e.dataTransfer.files[0]);
+        }
+    });
+    
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            updateFilePreview(this.files[0]);
+        }
+    });
+    
+    function updateFilePreview(file) {
+        fileName.textContent = file.name;
+        const size = (file.size / 1024 / 1024).toFixed(2);
+        fileSize.textContent = size + ' MB';
+        
+        // Detect method from extension
+        const fileExtension = file.name.split('.').pop();
+        const fileIcon = document.querySelector('.file-info .file-icon');
+        const methodAesRadio = document.querySelector('input[name="method"][value="aes"]');
+        const methodFernetRadio = document.querySelector('input[name="method"][value="fernet"]');
+        const methodAesCard = document.getElementById('methodAes');
+        const methodFernetCard = document.getElementById('methodFernet');
+
+        methodAesCard.classList.remove('active');
+        methodFernetCard.classList.remove('active');
+        
+        if (fileExtension === 'aes') {
+            if (fileIcon) {
+                fileIcon.classList.remove('bi-file-earmark-lock2', 'bi-question-circle');
+                fileIcon.classList.add('bi-filetype-key');
+            }
+            methodAesRadio.checked = true;
+            methodAesCard.classList.add('active');
+        } else if (fileExtension === 'fernet') {
+            if (fileIcon) {
+                fileIcon.classList.remove('bi-filetype-key', 'bi-question-circle');
+                fileIcon.classList.add('bi-file-earmark-lock2');
+            }
+            methodFernetRadio.checked = true;
+            methodFernetCard.classList.add('active');
+        } else {
+            if (fileIcon) {
+                fileIcon.classList.remove('bi-filetype-key', 'bi-file-earmark-lock2');
+                fileIcon.classList.add('bi-question-circle');
+            }
+            // If unknown, no radio button is checked. Can add a default or prompt user.
+        }
+        
+        dropContent.style.display = 'none';
+        filePreview.style.display = 'block';
+    }
+    
+    removeFile.addEventListener('click', function(e) {
+        e.stopPropagation();
+        fileInput.value = '';
+        dropContent.style.display = 'block';
+        filePreview.style.display = 'none';
+        
+        // Reset method selection
+        document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
+        document.querySelector('input[name="method"][value="aes"]').checked = true; // Default to AES
+        document.getElementById('methodAes').classList.add('active');
+
+        // Reset file icon
+        const fileIcon = document.querySelector('.file-info .file-icon');
+        if (fileIcon) {
+            fileIcon.classList.remove('bi-filetype-key', 'bi-file-earmark-lock2', 'bi-question-circle');
+            fileIcon.classList.add('bi-file-earmark-lock');
+        }
+    });
+    
+    // ===== Password Toggle =====
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    
+    if (togglePassword && passwordInput) {
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('bi-eye');
+            this.querySelector('i').classList.toggle('bi-eye-slash');
+        });
+    }
+    
+    // ===== Method Selector =====
+    const methodCards = document.querySelectorAll('.method-card');
+    methodCards.forEach(card => {
+        card.addEventListener('click', function() {
+            methodCards.forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            this.querySelector('input[type="radio"]').checked = true;
+        });
+    });
+    
+    // ===== Form Submit Loading =====
+    const form = document.getElementById('decryptForm');
+    const submitBtn = document.getElementById('decryptBtn');
+    
+    form.addEventListener('submit', function(e) {
+        if (!fileInput.files || fileInput.files.length === 0) {
+            e.preventDefault();
+            dropZone.classList.add('error'); // Add error class for visual feedback
+            setTimeout(() => {
+                dropZone.classList.remove('error');
+            }, 2000);
+            return;
+        }
+        
+        submitBtn.disabled = true;
+        submitBtn.querySelector('i').classList.add('d-none');
+        submitBtn.querySelector('.btn-loader').classList.remove('d-none');
+    });
+});
+</script>
 {% endblock %}
