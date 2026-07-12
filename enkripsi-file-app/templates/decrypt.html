@@ -4,42 +4,63 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-7">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h3 class="card-title text-center mb-4">Decrypt a File</h3>
-                <p class="text-center text-muted mb-4">Upload an encrypted file, provide the correct password and method to restore the original data.</p>
+    <div class="col-md-10 col-lg-8">
+        <div class="card p-lg-4">
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold">Decrypt a File</h2>
+                    <p class="text-muted-custom">Restore your original data by decrypting a file.</p>
+                </div>
                 
                 <form method="post" enctype="multipart/form-data">
-                    <div class="mb-3">
-                        <label for="file" class="form-label">File to Decrypt</label>
-                        <input class="form-control" type="file" id="file" name="file" required>
+                    <!-- Step 1: File Upload -->
+                    <div class="mb-4">
+                        <label class="form-label">1. Upload Your Encrypted File</label>
+                        <input class="d-none" type="file" id="file" name="file" required>
+                        <div id="drop-zone" class="drop-zone">
+                            <div id="file-info">
+                                <i class="bi bi-cloud-arrow-up"></i>
+                                <div>Drag & drop your file here, or click to select</div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Decryption Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+                    <!-- Step 2: Password -->
+                    <div class="mb-4">
+                        <label for="password" class="form-label">2. Enter Decryption Password</label>
+                        <div class="position-relative">
+                           <i class="bi bi-key input-group-icon"></i>
+                           <input type="password" class="form-control form-control-icon" id="password" name="password" required placeholder="Enter the decryption password">
+                        </div>
                         <div class="form-text">You must use the same password and method used for encryption.</div>
                     </div>
 
-                    <fieldset class="mb-3">
-                        <legend class="form-label fs-6">Decryption Method</legend>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="method" id="method_aes" value="aes" checked>
-                            <label class="form-check-label" for="method_aes">
-                                AES (Advanced Encryption Standard)
-                            </label>
+                    <!-- Step 3: Method Selection -->
+                    <div class="mb-4">
+                        <label class="form-label">3. Select Original Encryption Method</label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input class="form-check-input d-none" type="radio" name="method" id="method_aes" value="aes" checked>
+                                <label class="method-select-label text-center h-100" for="method_aes">
+                                    <strong class="d-block">AES</strong>
+                                    <small class="text-muted-custom">Standard</small>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <input class="form-check-input d-none" type="radio" name="method" id="method_fernet" value="fernet">
+                                <label class="method-select-label text-center h-100" for="method_fernet">
+                                    <strong class="d-block">Fernet</strong>
+                                    <small class="text-muted-custom">High-level</small>
+                                </label>
+                            </div>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="method" id="method_fernet" value="fernet">
-                            <label class="form-check-label" for="method_fernet">
-                                Fernet (High-level Symmetric Encryption)
-                            </label>
-                        </div>
-                    </fieldset>
+                    </div>
                     
+                    <!-- Submit Button -->
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg">Decrypt and Download</button>
+                        <button type="submit" class="btn btn-secondary btn-lg">
+                            <i class="bi bi-file-earmark-check-fill me-2"></i> Decrypt and Download
+                        </button>
                     </div>
                 </form>
             </div>
