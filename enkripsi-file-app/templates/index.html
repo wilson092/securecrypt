@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-white rounded-3 shadow-sm text-center">
+    <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold">Welcome to SecureCrypt</h1>
+        <p class="fs-4">Your personal tool for encrypting and decrypting files with confidence.</p>
+        <p>Choose an action below to get started.</p>
+    </div>
+</div>
+
+<div class="row align-items-md-stretch">
+    <div class="col-md-6 mb-4">
+        <div class="h-100 p-5 text-white bg-success rounded-3 shadow">
+            <h2>Encrypt File</h2>
+            <p>Upload a file and secure it using state-of-the-art AES or Fernet encryption. Keep your sensitive data safe from unauthorized access.</p>
+            <a href="{{ url_for('encrypt') }}" class="btn btn-outline-light btn-lg">Encrypt Now &raquo;</a>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="h-100 p-5 bg-primary text-white rounded-3 shadow">
+            <h2>Decrypt File</h2>
+            <p>Have an encrypted file? Upload it here with the correct password to retrieve the original content safely and quickly.</p>
+            <a href="{{ url_for('decrypt') }}" class="btn btn-outline-light btn-lg">Decrypt Now &raquo;</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
