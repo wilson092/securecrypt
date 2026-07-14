@@ -245,8 +245,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const zone = this.querySelector('.drop-zone');
                 if (zone && (!fileInput.files || fileInput.files.length === 0)) {
                     e.preventDefault();
-                    zone.style.borderColor = '#EF4444';
-                    zone.style.background = '#FEF2F2';
+                    zone.style.borderColor = '#f87171';
+                    zone.style.background = 'rgba(248, 113, 113, 0.08)';
                     setTimeout(function() {
                         zone.style.borderColor = '';
                         zone.style.background = '';
@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================
     // 11. CONSOLE WELCOME
     // ============================================
-    console.log('%c🔐 SecureCrypt', 'font-size: 24px; font-weight: 700; color: #2563EB;');
-    console.log('%cKeamanan data adalah prioritas utama', 'font-size: 14px; color: #64748B;');
-    console.log('%c💡 Tips: Ctrl+E untuk enkripsi, Ctrl+D untuk dekripsi', 'font-size: 12px; color: #94A3B8;');
+    console.log('%c🔐 SecureCrypt', 'font-size: 24px; font-weight: 700; color: #38bdf8;');
+    console.log('%cKeamanan data adalah prioritas utama', 'font-size: 14px; color: #93a1b7;');
+    console.log('%c💡 Tips: Ctrl+E untuk enkripsi, Ctrl+D untuk dekripsi', 'font-size: 12px; color: #5b6b85;');
 });
